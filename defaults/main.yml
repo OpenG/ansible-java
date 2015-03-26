@@ -1,0 +1,4 @@
+---
+java:
+  tarball_url: http://download.oracle.com/otn-pub/java/jdk/8u40-b25/server-jre-8u40-linux-x64.tar.gz
+  version: 1.8.0_40
