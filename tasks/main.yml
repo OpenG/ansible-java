@@ -1,36 +1,34 @@
 ---
-- name: create java directory
+- name: download tarball
+  command: curl
+    --location
+    --header "Cookie:oraclelicense=accept-securebackup-cookie"
+    --output /tmp/{{ java_tarball_file }}
+    {{ java_tarball_url }}
+  args:
+    creates: /tmp/{{ java_tarball_file }}
+  tags:
+    - java
+
+- name: create install directory
   file: path=/usr/java state=directory
   tags:
     - java
 
-- name: download java tarball
-  command: curl
-    --location
-    --header "Cookie:oraclelicense=accept-securebackup-cookie"
-    --output /usr/java/jdk{{ java.version }}.tar.gz
-    {{ java.tarball_url }}
-  args:
-    creates: /usr/java/jdk{{ java.version }}.tar.gz
+- name: unarchive tarball
+  unarchive: src=/tmp/{{ java_tarball_file }} dest=/usr/java copy=no
   tags:
     - java
 
-- name: unarchive java tarball
-  unarchive: src=/usr/java/jdk{{ java.version }}.tar.gz dest=/usr/java copy=no
+- name: link latest version
+  file: src=/usr/java/jdk{{ java_version }} dest=/usr/java/latest state=link
   tags:
     - java
 
-- name: create a link to latest java version
-  file: src=/usr/java/jdk{{ java.version }} dest=/usr/java/latest state=link
-  tags:
-    - java
-
-- name: create a link to default java version
+- name: link default version
   file: src=/usr/java/latest dest=/usr/java/default state=link
   tags:
     - java
 
 - name: register java bin
   file: src=/usr/java/default/bin/java dest=/usr/bin/java state=link
-  tags:
-    - java
